@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+// 화살표 아이콘 대신 유니코드 문자 사용
 
 const WorkScheduleDisplay = () => {
   const [date, setDate] = useState(new Date());
@@ -177,7 +177,7 @@ const WorkScheduleDisplay = () => {
                 onClick={handlePrevMonth}
                 className="p-1 hover:bg-gray-100 rounded"
               >
-                <ChevronLeft className="w-5 h-5" />
+                ←
               </button>
               <h2 className="text-xl font-bold">
                 {date.getFullYear()}년 {monthNames[date.getMonth()]}
@@ -186,7 +186,7 @@ const WorkScheduleDisplay = () => {
                 onClick={handleNextMonth}
                 className="p-1 hover:bg-gray-100 rounded"
               >
-                <ChevronRight className="w-5 h-5" />
+                →
               </button>
             </div>
           </div>
