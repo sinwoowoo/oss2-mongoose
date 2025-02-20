@@ -93,8 +93,8 @@ const WorkScheduleDisplay = () => {
   const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="flex gap-4 p-4">
+    <div className="w-full h-screen p-4 bg-gray-50">
+      <div className="flex gap-4 h-[calc(100vh-2rem)]">
         {/* Worker Management Section */}
         <div className="w-96 p-4 border rounded-lg bg-white shadow">
           <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
@@ -155,8 +155,8 @@ const WorkScheduleDisplay = () => {
         </div>
 
         {/* Calendar Section */}
-        <div className="flex-1 border rounded-lg bg-white shadow">
-          <div className="p-4 border-b">
+        <div className="flex-1 border rounded-lg bg-white shadow flex flex-col h-full">
+          <div className="p-4 border-b flex-shrink-0">
             <div className="flex justify-between items-center">
               <button 
                 onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1))}
@@ -176,7 +176,7 @@ const WorkScheduleDisplay = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-7 border-b">
+          <div className="grid grid-cols-7 border-b flex-shrink-0">
             {dayNames.map(day => (
               <div key={day} className="p-2 text-center font-semibold bg-gray-50">
                 {day}
@@ -184,7 +184,7 @@ const WorkScheduleDisplay = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-7 h-full">
+          <div className="grid grid-cols-7 flex-1 overflow-auto">
             {createCalendarDays().map((day, index) => {
               const daySchedules = getDaySchedules(day.date);
               return (
@@ -192,7 +192,7 @@ const WorkScheduleDisplay = () => {
                   key={index}
                   onClick={() => setDate(new Date(day.date))}
                   className={`
-                    min-h-24 p-2 border-b border-r relative
+                    h-32 p-2 border-b border-r relative
                     ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
                     ${day.date.toDateString() === date.toDateString() ? 'bg-blue-50' : ''}
                     hover:bg-gray-50 cursor-pointer
