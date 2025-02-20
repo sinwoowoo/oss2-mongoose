@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Calendar } from './components/ui/calendar';
+import { Input } from './components/ui/input';
+import { Button } from './components/ui/button';
+import { Card, CardContent } from './components/ui/card';
 
 const WorkScheduleDisplay = () => {
   const [date, setDate] = useState(new Date());
@@ -10,7 +10,6 @@ const WorkScheduleDisplay = () => {
   const [schedules, setSchedules] = useState([]);
   const [newWorker, setNewWorker] = useState({ name: '', position: '' });
 
-  // 새로운 근무자 추가 함수
   const handleAddWorker = () => {
     if (newWorker.name && newWorker.position) {
       const worker = {
@@ -23,7 +22,6 @@ const WorkScheduleDisplay = () => {
     }
   };
 
-  // 근무 일정 추가 함수
   const handleAddSchedule = (workerId, shift) => {
     const newSchedule = {
       date: date,
@@ -33,20 +31,17 @@ const WorkScheduleDisplay = () => {
     setSchedules([...schedules, newSchedule]);
   };
 
-  // 선택된 날짜의 근무 일정 조회
   const getDaySchedules = (date) => {
     return schedules.filter(schedule => 
       schedule.date.toDateString() === date.toDateString()
     );
   };
 
-  // 근무자 삭제 함수
   const handleDeleteWorker = (workerId) => {
     setWorkers(workers.filter(worker => worker.id !== workerId));
     setSchedules(schedules.filter(schedule => schedule.workerId !== workerId));
   };
 
-  // 근무 일정 삭제 함수
   const handleDeleteSchedule = (workerId, date) => {
     setSchedules(schedules.filter(schedule => 
       !(schedule.workerId === workerId && 
