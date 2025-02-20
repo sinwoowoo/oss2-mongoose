@@ -9,11 +9,5 @@ export const store = configureStore({
     items: itemsReducer,
     lists: listsReducer,
     user: userReducer
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [/* 필요한 액션들 */],
-      },
-    }).concat(api.middleware),
+  }
 });
