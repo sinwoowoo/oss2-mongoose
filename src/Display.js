@@ -1,0 +1,181 @@
+import React, { useState } from 'react';
+import { Calendar } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+
+// 근무자 정보 타입 정의
+interface Worker {
+  id: string;
+  name: string;
+  position: string;
+}
+
+// 근무 일정 타입 정의
+interface Schedule {
+  date: Date;
+  workerId: string;
+  shift: 'day' | 'night';
+}
+
+const WorkScheduleDisplay = () => {
+  const [date, setDate] = useState<Date>(new Date());
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [newWorker, setNewWorker] = useState({ name: '', position: '' });
+
+  // 새로운 근무자 추가 함수
+  const handleAddWorker = () => {
+    if (newWorker.name && newWorker.position) {
+      const worker: Worker = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: newWorker.name,
+        position: newWorker.position
+      };
+      setWorkers([...workers, worker]);
+      setNewWorker({ name: '', position: '' });
+    }
+  };
+
+  // 근무 일정 추가 함수
+  const handleAddSchedule = (workerId: string, shift: 'day' | 'night') => {
+    const newSchedule: Schedule = {
+      date: date,
+      workerId,
+      shift
+    };
+    setSchedules([...schedules, newSchedule]);
+  };
+
+  // 선택된 날짜의 근무 일정 조회
+  const getDaySchedules = (date: Date) => {
+    return schedules.filter(schedule => 
+      schedule.date.toDateString() === date.toDateString()
+    );
+  };
+
+  // 근무자 삭제 함수
+  const handleDeleteWorker = (workerId: string) => {
+    setWorkers(workers.filter(worker => worker.id !== workerId));
+    setSchedules(schedules.filter(schedule => schedule.workerId !== workerId));
+  };
+
+  // 근무 일정 삭제 함수
+  const handleDeleteSchedule = (workerId: string, date: Date) => {
+    setSchedules(schedules.filter(schedule => 
+      !(schedule.workerId === workerId && 
+        schedule.date.toDateString() === date.toDateString())
+    ));
+  };
+
+  return (
+    <div className="flex flex-col space-y-4 p-4">
+      <div className="flex space-x-4">
+        <Card className="w-1/2">
+          <CardContent className="pt-6">
+            <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
+            <div className="flex flex-col space-y-2">
+              <Input
+                placeholder="이름"
+                value={newWorker.name}
+                onChange={(e) => setNewWorker({...newWorker, name: e.target.value})}
+              />
+              <Input
+                placeholder="직책"
+                value={newWorker.position}
+                onChange={(e) => setNewWorker({...newWorker, position: e.target.value})}
+              />
+              <Button 
+                onClick={handleAddWorker}
+                className="w-full"
+              >
+                근무자 추가
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">근무자 목록</h3>
+              <div className="space-y-2">
+                {workers.map(worker => (
+                  <div key={worker.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <div>
+                      <span className="font-medium">{worker.name}</span>
+                      <span className="text-gray-500 ml-2">({worker.position})</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button 
+                        onClick={() => handleAddSchedule(worker.id, 'day')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        주간
+                      </Button>
+                      <Button 
+                        onClick={() => handleAddSchedule(worker.id, 'night')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        야간
+                      </Button>
+                      <Button 
+                        onClick={() => handleDeleteWorker(worker.id)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="w-1/2">
+          <CardContent className="pt-6">
+            <h2 className="text-xl font-bold mb-4">근무 일정</h2>
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(date) => date && setDate(date)}
+              className="rounded-md border"
+            />
+
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">
+                {date.toLocaleDateString('ko-KR', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} 근무 일정
+              </h3>
+              {getDaySchedules(date).map((schedule, index) => {
+                const worker = workers.find(w => w.id === schedule.workerId);
+                return (
+                  <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded mb-2">
+                    <div>
+                      <span className="font-medium">{worker?.name}</span>
+                      <span className="text-gray-500 ml-2">
+                        {schedule.shift === 'day' ? '주간' : '야간'} 근무
+                      </span>
+                    </div>
+                    <Button 
+                      onClick={() => handleDeleteSchedule(schedule.workerId, schedule.date)}
+                      variant="destructive"
+                      size="sm"
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default WorkScheduleDisplay;
