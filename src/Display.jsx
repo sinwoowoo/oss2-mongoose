@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import Calendar from './Calendar';
+import Calendar from 'react-calendar';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 const WorkScheduleDisplay = () => {
   const [date, setDate] = useState(new Date());
@@ -23,8 +25,7 @@ const WorkScheduleDisplay = () => {
     const newSchedule = {
       date: date,
       workerId,
-      shift,
-      id: Math.random().toString(36).substr(2, 9)
+      shift
     };
     setSchedules([...schedules, newSchedule]);
   };
@@ -41,29 +42,25 @@ const WorkScheduleDisplay = () => {
     ));
   };
 
-  const getDaySchedules = (targetDate) => {
+  const getDaySchedules = (date) => {
     return schedules.filter(schedule => 
-      schedule.date.toDateString() === targetDate.toDateString()
+      schedule.date.toDateString() === date.toDateString()
     );
   };
 
-  const renderCalendarContent = (date) => {
+  const tileContent = ({ date }) => {
     const daySchedules = getDaySchedules(date);
-    if (daySchedules.length === 0) return null;
-
     return (
-      <div className="space-y-1 mt-1">
+      <div className="text-xs">
         {daySchedules.map((schedule, idx) => {
           const worker = workers.find(w => w.id === schedule.workerId);
           return (
-            <div 
+            <div
               key={idx}
-              className={`
-                text-xs p-1 rounded truncate
+              className={`mt-1 p-1 rounded truncate
                 ${schedule.shift === 'day' 
                   ? 'bg-blue-100 text-blue-800' 
-                  : 'bg-purple-100 text-purple-800'}
-              `}
+                  : 'bg-purple-100 text-purple-800'}`}
             >
               {worker?.name}
             </div>
@@ -74,57 +71,57 @@ const WorkScheduleDisplay = () => {
   };
 
   return (
-    <div className="w-full h-screen p-4 bg-gray-50">
-      <div className="flex gap-4 h-[calc(100vh-2rem)]">
-        {/* Worker Management Panel - Minimized */}
-        <div className="w-72 p-4 border rounded-lg bg-white shadow shrink-0">
-          <h2 className="text-lg font-bold mb-2">근무자 관리</h2>
-          <div className="flex flex-col gap-1">
+    <div className="mx-auto max-w-6xl">
+      <div className="flex gap-4 p-4">
+        {/* 근무자 관리 패널 */}
+        <div className="w-96 p-4 border rounded-lg bg-white shadow-sm">
+          <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
+          <div className="flex flex-col gap-2">
             <input
-              className="w-full p-1 border rounded text-sm"
+              className="w-full p-2 border rounded"
               placeholder="이름"
               value={newWorker.name}
               onChange={(e) => setNewWorker({...newWorker, name: e.target.value})}
             />
             <input
-              className="w-full p-1 border rounded text-sm"
+              className="w-full p-2 border rounded"
               placeholder="직책"
               value={newWorker.position}
               onChange={(e) => setNewWorker({...newWorker, position: e.target.value})}
             />
             <button 
               onClick={handleAddWorker}
-              className="w-full p-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+              className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              추가
+              근무자 추가
             </button>
           </div>
 
-          <div className="mt-2">
-            <h3 className="text-sm font-semibold mb-1">근무자 목록</h3>
-            <div className="space-y-1 max-h-96 overflow-y-auto">
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">근무자 목록</h3>
+            <div className="space-y-2">
               {workers.map(worker => (
-                <div key={worker.id} className="flex justify-between items-center p-1 bg-gray-50 rounded text-sm">
-                  <div className="flex-1 truncate">
+                <div key={worker.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
                     <span className="font-medium">{worker.name}</span>
-                    <span className="text-gray-500 ml-1">({worker.position})</span>
+                    <span className="text-gray-500 ml-2">({worker.position})</span>
                   </div>
                   <div className="flex gap-1">
                     <button 
                       onClick={() => handleAddSchedule(worker.id, 'day')}
-                      className="px-1 py-0.5 bg-blue-500 text-white rounded text-xs"
+                      className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
                     >
-                      주
+                      주간
                     </button>
                     <button 
                       onClick={() => handleAddSchedule(worker.id, 'night')}
-                      className="px-1 py-0.5 bg-purple-500 text-white rounded text-xs"
+                      className="px-2 py-1 bg-purple-500 text-white rounded text-sm"
                     >
-                      야
+                      야간
                     </button>
                     <button 
                       onClick={() => handleDeleteWorker(worker.id)}
-                      className="px-1 py-0.5 bg-red-500 text-white rounded text-xs"
+                      className="px-2 py-1 bg-red-500 text-white rounded text-sm"
                     >
                       삭제
                     </button>
@@ -135,45 +132,41 @@ const WorkScheduleDisplay = () => {
           </div>
         </div>
 
-        {/* Calendar Section - Expanded */}
-        <div className="flex-1 border rounded-lg bg-white shadow flex flex-col">
+        {/* 달력 섹션 */}
+        <div className="flex-1 p-4 border rounded-lg bg-white shadow-sm">
           <Calendar
-            value={date}
             onChange={setDate}
-            renderContent={renderCalendarContent}
+            value={date}
+            locale="ko"
+            tileContent={tileContent}
+            className="w-full"
           />
 
-          {/* Selected Date Schedule Details */}
+          {/* 선택된 날짜의 상세 일정 */}
           {getDaySchedules(date).length > 0 && (
-            <div className="p-4 border-t bg-gray-50">
-              <h3 className="text-sm font-semibold mb-2">
-                {date.toLocaleDateString('ko-KR', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })} 근무 일정
+            <div className="mt-4 p-4 border rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">
+                {format(date, 'PPP', { locale: ko })} 근무 일정
               </h3>
-              <div className="space-y-1">
-                {getDaySchedules(date).map((schedule, index) => {
-                  const worker = workers.find(w => w.id === schedule.workerId);
-                  return (
-                    <div key={index} className="flex justify-between items-center p-2 bg-white rounded shadow-sm">
-                      <div>
-                        <span className="font-medium">{worker?.name}</span>
-                        <span className="text-gray-500 ml-2">
-                          {schedule.shift === 'day' ? '주간' : '야간'} 근무
-                        </span>
-                      </div>
-                      <button 
-                        onClick={() => handleDeleteSchedule(schedule.workerId, schedule.date)}
-                        className="px-2 py-1 bg-red-500 text-white rounded text-xs"
-                      >
-                        삭제
-                      </button>
+              {getDaySchedules(date).map((schedule, index) => {
+                const worker = workers.find(w => w.id === schedule.workerId);
+                return (
+                  <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded mb-2">
+                    <div>
+                      <span className="font-medium">{worker?.name}</span>
+                      <span className="text-gray-500 ml-2">
+                        {schedule.shift === 'day' ? '주간' : '야간'} 근무
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
+                    <button 
+                      onClick={() => handleDeleteSchedule(schedule.workerId, schedule.date)}
+                      className="px-2 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
