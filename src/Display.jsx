@@ -1,63 +1,13 @@
 import React, { useState } from 'react';
+import Calendar from 'react-calendar';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 const WorkScheduleDisplay = () => {
   const [date, setDate] = useState(new Date());
   const [workers, setWorkers] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [newWorker, setNewWorker] = useState({ name: '', position: '' });
-
-  // Calendar helper functions
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (year, month) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
-  };
-
-  const createCalendarDays = () => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const days = [];
-
-    // Previous month days
-    const prevMonthDays = getDaysInMonth(year, month - 1);
-    for (let i = firstDay - 1; i >= 0; i--) {
-      days.push({
-        date: new Date(year, month - 1, prevMonthDays - i),
-        isCurrentMonth: false
-      });
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({
-        date: new Date(year, month, i),
-        isCurrentMonth: true
-      });
-    }
-
-    // Next month days
-    const remainingDays = 42 - days.length;
-    for (let i = 1; i <= remainingDays; i++) {
-      days.push({
-        date: new Date(year, month + 1, i),
-        isCurrentMonth: false
-      });
-    }
-
-    return days;
-  };
 
   const handleAddWorker = () => {
     if (newWorker.name && newWorker.position) {
@@ -98,13 +48,33 @@ const WorkScheduleDisplay = () => {
     );
   };
 
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  const tileContent = ({ date }) => {
+    const daySchedules = getDaySchedules(date);
+    return (
+      <div className="text-xs">
+        {daySchedules.map((schedule, idx) => {
+          const worker = workers.find(w => w.id === schedule.workerId);
+          return (
+            <div
+              key={idx}
+              className={`mt-1 p-1 rounded truncate
+                ${schedule.shift === 'day' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-purple-100 text-purple-800'}`}
+            >
+              {worker?.name}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
+    <div className="mx-auto max-w-6xl">
       <div className="flex gap-4 p-4">
-        {/* Worker Management Panel */}
-        <div className="w-80 p-4 border rounded-lg bg-white shadow-sm">
+        {/* 근무자 관리 패널 */}
+        <div className="w-96 p-4 border rounded-lg bg-white shadow-sm">
           <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
           <div className="flex flex-col gap-2">
             <input
@@ -162,78 +132,21 @@ const WorkScheduleDisplay = () => {
           </div>
         </div>
 
-        {/* Calendar Section */}
-        <div className="flex-1 p-4 border rounded-lg bg-white shadow-sm h-full flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <button 
-              onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1))}
-              className="p-2 hover:bg-gray-100 rounded text-2xl"
-            >
-              ←
-            </button>
-            <h2 className="text-2xl font-bold">
-              {date.getFullYear()}년 {date.getMonth() + 1}월
-            </h2>
-            <button 
-              onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1))}
-              className="p-2 hover:bg-gray-100 rounded text-2xl"
-            >
-              →
-            </button>
-          </div>
+        {/* 달력 섹션 */}
+        <div className="flex-1 p-4 border rounded-lg bg-white shadow-sm">
+          <Calendar
+            onChange={setDate}
+            value={date}
+            locale="ko"
+            tileContent={tileContent}
+            className="w-full"
+          />
 
-          <div className="border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-7">
-              {dayNames.map(day => (
-                <div key={day} className="h-16 flex items-center justify-center bg-gray-50 border-b font-semibold text-lg">
-                  {day}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7">
-              {createCalendarDays().map((day, index) => {
-                const daySchedules = getDaySchedules(day.date);
-                return (
-                  <div 
-                    key={index}
-                    onClick={() => setDate(new Date(day.date))}
-                    className={`
-                      h-40 p-2 border relative
-                      ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
-                      ${day.date.toDateString() === date.toDateString() ? 'bg-blue-50' : ''}
-                      cursor-pointer hover:bg-gray-100
-                    `}
-                  >
-                    <div className="font-medium text-xl">{day.date.getDate()}</div>
-                    <div className="space-y-1 mt-2 max-h-32 overflow-y-auto">
-                      {daySchedules.map((schedule, idx) => {
-                        const worker = workers.find(w => w.id === schedule.workerId);
-                        return (
-                          <div 
-                            key={idx}
-                            className={`
-                              text-sm p-2 rounded truncate
-                              ${schedule.shift === 'day' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-purple-100 text-purple-800'}
-                            `}
-                          >
-                            {worker?.name}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Selected Date Schedule Details */}
+          {/* 선택된 날짜의 상세 일정 */}
           {getDaySchedules(date).length > 0 && (
             <div className="mt-4 p-4 border rounded-lg">
               <h3 className="text-lg font-semibold mb-2">
-                {formatDate(date)} 근무 일정
+                {format(date, 'PPP', { locale: ko })} 근무 일정
               </h3>
               {getDaySchedules(date).map((schedule, index) => {
                 const worker = workers.find(w => w.id === schedule.workerId);
