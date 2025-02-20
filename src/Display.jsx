@@ -101,10 +101,10 @@ const WorkScheduleDisplay = () => {
   const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto w-full max-w-7xl">
       <div className="flex gap-4 p-4">
         {/* Worker Management Panel */}
-        <div className="w-96 p-4 border rounded-lg bg-white shadow-sm">
+        <div className="w-80 p-4 border rounded-lg bg-white shadow-sm">
           <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
           <div className="flex flex-col gap-2">
             <input
@@ -182,15 +182,15 @@ const WorkScheduleDisplay = () => {
             </button>
           </div>
 
-          <div className="border rounded-lg overflow-hidden flex-1">
-            <div className="grid grid-cols-7 h-full">
+          <div className="border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-7">
               {dayNames.map(day => (
-                <div key={day} className="h-12 flex items-center justify-center bg-gray-50 border-b font-semibold text-lg">
+                <div key={day} className="h-16 flex items-center justify-center bg-gray-50 border-b font-semibold text-lg">
                   {day}
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-7 h-full">
+            <div className="grid grid-cols-7">
               {createCalendarDays().map((day, index) => {
                 const daySchedules = getDaySchedules(day.date);
                 return (
@@ -198,14 +198,14 @@ const WorkScheduleDisplay = () => {
                     key={index}
                     onClick={() => setDate(new Date(day.date))}
                     className={`
-                      h-32 p-2 border
+                      h-40 p-2 border relative
                       ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
                       ${day.date.toDateString() === date.toDateString() ? 'bg-blue-50' : ''}
                       cursor-pointer hover:bg-gray-100
                     `}
                   >
-                    <div className="font-medium text-lg">{day.date.getDate()}</div>
-                    <div className="space-y-1 mt-2">
+                    <div className="font-medium text-xl">{day.date.getDate()}</div>
+                    <div className="space-y-1 mt-2 max-h-32 overflow-y-auto">
                       {daySchedules.map((schedule, idx) => {
                         const worker = workers.find(w => w.id === schedule.workerId);
                         return (
