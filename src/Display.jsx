@@ -1,64 +1,11 @@
 import React, { useState } from 'react';
-// 화살표 아이콘 대신 유니코드 문자 사용
+import Calendar from './Calendar';
 
 const WorkScheduleDisplay = () => {
   const [date, setDate] = useState(new Date());
   const [workers, setWorkers] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [newWorker, setNewWorker] = useState({ name: '', position: '' });
-
-  // Calendar helper functions
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (year, month) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const createCalendarDays = () => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const days = [];
-
-    // Previous month days
-    const prevMonthDays = getDaysInMonth(year, month - 1);
-    for (let i = firstDay - 1; i >= 0; i--) {
-      days.push({
-        date: new Date(year, month - 1, prevMonthDays - i),
-        isCurrentMonth: false
-      });
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({
-        date: new Date(year, month, i),
-        isCurrentMonth: true
-      });
-    }
-
-    // Next month days
-    const remainingDays = 42 - days.length; // Always show 6 weeks
-    for (let i = 1; i <= remainingDays; i++) {
-      days.push({
-        date: new Date(year, month + 1, i),
-        isCurrentMonth: false
-      });
-    }
-
-    return days;
-  };
-
-  const handlePrevMonth = () => {
-    setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1));
-  };
 
   const handleAddWorker = () => {
     if (newWorker.name && newWorker.position) {
@@ -100,11 +47,31 @@ const WorkScheduleDisplay = () => {
     );
   };
 
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  const monthNames = [
-    "1월", "2월", "3월", "4월", "5월", "6월",
-    "7월", "8월", "9월", "10월", "11월", "12월"
-  ];
+  const renderCalendarContent = (date) => {
+    const daySchedules = getDaySchedules(date);
+    if (daySchedules.length === 0) return null;
+
+    return (
+      <div className="space-y-1 mt-1">
+        {daySchedules.map((schedule, idx) => {
+          const worker = workers.find(w => w.id === schedule.workerId);
+          return (
+            <div 
+              key={idx}
+              className={`
+                text-xs p-1 rounded truncate
+                ${schedule.shift === 'day' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-purple-100 text-purple-800'}
+              `}
+            >
+              {worker?.name}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="w-full h-screen p-4 bg-gray-50">
@@ -170,81 +137,11 @@ const WorkScheduleDisplay = () => {
 
         {/* Calendar Section - Expanded */}
         <div className="flex-1 border rounded-lg bg-white shadow flex flex-col">
-          {/* Calendar Header */}
-          <div className="p-4 border-b flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={handlePrevMonth}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                ←
-              </button>
-              <h2 className="text-xl font-bold">
-                {date.getFullYear()}년 {monthNames[date.getMonth()]}
-              </h2>
-              <button 
-                onClick={handleNextMonth}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="flex-1 flex flex-col">
-            {/* Day Names */}
-            <div className="grid grid-cols-7 border-b bg-gray-50">
-              {dayNames.map(day => (
-                <div key={day} className="p-2 text-center font-semibold">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Days */}
-            <div className="flex-1 grid grid-cols-7 grid-rows-6">
-              {createCalendarDays().map((day, index) => {
-                const daySchedules = getDaySchedules(day.date);
-                const isToday = day.date.toDateString() === new Date().toDateString();
-                const isSelected = day.date.toDateString() === date.toDateString();
-
-                return (
-                  <div 
-                    key={index}
-                    onClick={() => setDate(new Date(day.date))}
-                    className={`
-                      p-2 border-b border-r relative
-                      ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
-                      ${isToday ? 'bg-blue-50' : ''}
-                      ${isSelected ? 'ring-2 ring-blue-500 ring-inset' : ''}
-                      hover:bg-gray-50 cursor-pointer
-                    `}
-                  >
-                    <div className="font-medium">{day.date.getDate()}</div>
-                    <div className="space-y-1 mt-1">
-                      {daySchedules.map((schedule, idx) => {
-                        const worker = workers.find(w => w.id === schedule.workerId);
-                        return (
-                          <div 
-                            key={idx}
-                            className={`
-                              text-xs p-1 rounded truncate
-                              ${schedule.shift === 'day' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-purple-100 text-purple-800'}
-                            `}
-                          >
-                            {worker?.name}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <Calendar
+            value={date}
+            onChange={setDate}
+            renderContent={renderCalendarContent}
+          />
 
           {/* Selected Date Schedule Details */}
           {getDaySchedules(date).length > 0 && (
