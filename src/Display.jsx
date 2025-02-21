@@ -194,7 +194,6 @@ const WorkScheduleDisplay = () => {
             }}
             />
         </div>
-      </div>
     </div>
   );
 };
