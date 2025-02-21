@@ -155,31 +155,44 @@ const WorkScheduleDisplay = () => {
 
         {/* Calendar Section */}
         <div className="flex-1 bg-white shadow-sm rounded-lg overflow-hidden">
-          <div className="h-full p-4">
-            <Calendar
-              localizer={localizer}
-              events={calendarEvents}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 'calc(100vh - 150px)' }}
-              eventPropGetter={eventStyleGetter}
-              onSelectEvent={(event) => handleDeleteSchedule(event.id)}
-              views={['month', 'week', 'day']}
-              defaultView="month"
-              date={date}
-              onNavigate={setDate}
-              messages={{
-                next: "다음",
-                previous: "이전",
-                today: "오늘",
-                month: "월",
-                week: "주",
-                day: "일",
-                agenda: "일정",
-                noEventsInRange: "등록된 일정이 없습니다."
-              }}
+          <Calendar
+            localizer={localizer}
+            events={calendarEvents}
+            startAccessor="start"
+            endAccessor="end"
+            // Calendar 높이를 컨테이너에 맞춤
+            style={{ 
+              height: 'calc(100vh - 32px)',
+              margin: '0',
+              padding: '1rem'
+            }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={(event) => handleDeleteSchedule(event.id)}
+            views={['month', 'week', 'day']}
+            defaultView="month"
+            date={date}
+            onNavigate={setDate}
+            // 일자 셀 높이 조정
+            formats={{
+              dateFormat: 'dd',
+              dayFormat: 'ddd',
+              monthHeaderFormat: 'YYYY년 MM월'
+            }}
+            // 각 셀의 최소 높이 설정
+            dayLayoutAlgorithm={'no-overlap'}
+            // Calendar 스타일 커스터마이징
+            className="h-full"
+            messages={{
+              next: "다음",
+              previous: "이전",
+              today: "오늘",
+              month: "월",
+              week: "주",
+              day: "일",
+              agenda: "일정",
+              noEventsInRange: "등록된 일정이 없습니다."
+            }}
             />
-          </div>
         </div>
       </div>
     </div>
