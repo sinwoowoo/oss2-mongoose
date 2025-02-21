@@ -14,14 +14,15 @@ function App() {
   const userDetails = useSelector(selectUserDetails);
 
   return (
-    <article>
+    <div className="min-h-screen bg-gray-100">
       <TopBar />
-
+      <main className="h-[calc(100vh-64px)]"> {/* TopBar 높이를 제외한 전체 높이 */}
         {userDetails === ''
-          ? <h4>Login to see todo items</h4>
+          ? <h4 className="p-4">Login to see todo items</h4>
           : <Display />
         }
-    </article>
+      </main>
+    </div>
   );
 }
 
