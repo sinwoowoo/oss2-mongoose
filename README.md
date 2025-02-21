@@ -173,8 +173,8 @@ oss2-mongoose/
 프로젝트 링크: [https://github.com/sinwoowoo/oss2-mongoose](https://github.com/sinwoowoo/oss2-mongoose)
 
 ## 참고사이트
-static webapp :  [https://www.azurestaticwebapps.dev/collections/dab](https://www.azurestaticwebapps.dev/collections/dab)
-big calendar : [https://jquense.github.io/react-big-calendar/examples/?path=/story/about-big-calendar--page](https://jquense.github.io/react-big-calendar/examples/?path=/story/about-big-calendar--page)
+- static webapp :  [https://www.azurestaticwebapps.dev/collections/dab](https://www.azurestaticwebapps.dev/collections/dab)
+- big calendar : [https://jquense.github.io/react-big-calendar/examples/?path=/story/about-big-calendar--page](https://jquense.github.io/react-big-calendar/examples/?path=/story/about-big-calendar--page)
 
 ***
 ***
