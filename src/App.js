@@ -14,9 +14,9 @@ function App() {
   const userDetails = useSelector(selectUserDetails);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen flex flex-col">
       <TopBar />
-      <main className="h-[calc(100vh-64px)]"> {/* TopBar 높이를 제외한 전체 높이 */}
+      <main className="flex-1 overflow-hidden">
         {userDetails === ''
           ? <h4 className="p-4">Login to see todo items</h4>
           : <Display />
