@@ -154,7 +154,7 @@ const WorkScheduleDisplay = () => {
         </div>
 
         {/* Calendar Section */}
-        <div className="flex-1 bg-white shadow-sm rounded-lg overflow-hidden">
+        <div className="flex-1 bg-white shadow-sm rounded-lg overflow-hidden" style={{ width: "1200px", fontSize: "14px" }}>
           <div className="h-full p-4">
             <Calendar
               localizer={localizer}
