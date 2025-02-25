@@ -96,26 +96,26 @@ const WorkScheduleDisplay = () => {
         <div className="w-80 bg-white shadow-sm rounded-lg overflow-hidden">
           <div className="p-4">
             <h2 className="text-xl font-bold mb-4">근무자 관리</h2>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <input
-                className="w-full p-2 border rounded"
+                className="w-full py-0.5 px-1 border rounded text-xs h-6"
                 placeholder="이름"
                 value={newWorker.name}
                 onChange={(e) => setNewWorker({...newWorker, name: e.target.value})}
               />
               <input
-                className="w-full p-2 border rounded"
+                className="w-full py-0.5 px-1 border rounded text-xs h-6"
                 placeholder="직책"
                 value={newWorker.position}
                 onChange={(e) => setNewWorker({...newWorker, position: e.target.value})}
               />
               <button 
                 onClick={handleAddWorker}
-                className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="w-full py-0.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs h-6"
               >
-                근무자 추가
-              </button>
-            </div>
+                추가
+             </button>
+          </div>
 
             <div className="mt-4">
               <h3 className="text-lg font-semibold mb-2">근무자 목록</h3>
